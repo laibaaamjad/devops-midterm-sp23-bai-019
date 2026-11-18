@@ -48,9 +48,14 @@ pipeline {
     always {
       script {
         def m = fileExists('metrics_out.json') ? readFile('metrics_out.json') : 'n/a'
-        emailext(
+        def committerEmail = sh(
+            script: "git log -1 --pretty=format:'%ae'",
+            returnStdout: true
+            ).trim()
+
+emailext(
           from: 'laibiioye22@gmail.com',
-          to: 'qasimalik@gmail.com',
+          to: committerEmail,
           subject: "[${REG}] Retrain pipeline #${env.BUILD_NUMBER}: ${currentBuild.currentResult}",
           body: "Student Reg No: ${REG}\nResult: ${currentBuild.currentResult}\nCommit: ${env.GIT_COMMIT}\nMetrics: ${m}\nBuild: ${env.BUILD_URL}"
         )
